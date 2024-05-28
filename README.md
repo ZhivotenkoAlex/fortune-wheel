@@ -1,36 +1,27 @@
 # vue-fortune-wheel
 
-This template should help get you started developing with Vue 3 in Vite.
+`vue-fortune-wheel` is a Vue 3 project built with Vite. It provides a customizable and interactive fortune wheel component that can be used in various applications such as games, quizzes, or promotional events. The wheel can be easily configured with custom segments, colors, and event handlers for a personalized user experience.
 
-## Recommended IDE Setup
+This project is set up with a recommended IDE setup for optimal development experience, including VSCode, Volar, and the TypeScript Vue Plugin. It also uses `vue-tsc` for type checking to handle type information for `.vue` imports in TypeScript.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## Features
 
-## Type Support for `.vue` Imports in TS
+- **Customizable Fortune Wheel**: The main feature of this project is the customizable fortune wheel. You can easily configure the segments, colors, and event handlers to fit your application's needs.
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+- **Vue 3 and Vite**: This project is built with Vue 3 for a modern, reactive UI and Vite for a fast and lean development experience.
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+- **TypeScript Support**: This project is set up with TypeScript for static type checking, improving developer productivity and code quality.
 
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+- **Recommended IDE Setup**: This project recommends using VSCode with the Volar and TypeScript Vue Plugin extensions for a smooth and productive development experience.
 
-## Customize configuration
+## Getting Started
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+To get started with `vue-fortune-wheel`, clone the repository and install the dependencies with `npm install`. You can start the development server with `npm run dev`, which supports hot-reloading for a smooth development experience.
 
 ## Project Setup
 
 ```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
 ```
 
 ### Type-Check, Compile and Minify for Production
@@ -45,4 +36,8 @@ npm run build
 npm run lint
 ```
 
-"# vue-fortune-wheel"
+### Compile and Hot-Reload for Development
+
+## dev
+
+For more information on customizing the configuration, see the [Vite Configuration Reference](https://vitejs.dev/config/).
