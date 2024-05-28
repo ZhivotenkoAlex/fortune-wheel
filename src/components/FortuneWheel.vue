@@ -9,22 +9,18 @@
         :key="index"
         :skewY="gridSkewY"
         :rotate="index * gridRotate"
-        :gridItem="item"
+        :gridItem="item as any"
         :size="size"
       />
     </div>
   </div>
 </template>
-<!-- fortuneWheel-Container 輪盤最外層，用於控制整個輪盤大小 
-     fortuneWheel-Base 輪盤內容物的基準點
-     wheelItem 內容物，根據有多少內容物調整角度
-     wheelItemContent 實際內容存放處，內容物要在item致中
--->
 
 <script setup lang="ts">
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, defineProps, defineEmits, ref, watch } from "vue";
 import WheelGrid from "./WheelGrid.vue";
 
+// Define component props and emits
 const props = defineProps({
   size: { type: String, required: true, default: "100px" },
   gridData: { type: Array, required: true, default: () => [] },
@@ -33,22 +29,19 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue", "onEnd"]);
-const currentRotateDeg: Ref<number> = ref(0);
-/*
-wheelGrid 內角公式(skewY) : 90 - 360 / item 個數
-*/
+const currentRotateDeg = ref(0);
+
+// Compute the skewY angle for each wheel grid item
 const gridSkewY = computed(() => {
   return 90 - 360 / props.gridData.length;
 });
-/*
-wheelGrid 旋轉角度
-*/
+
+// Compute the rotation angle for each wheel grid item
 const gridRotate = computed(() => {
   return 360 / props.gridData.length;
 });
-/*
- fortuneWheel 樣式
-*/
+
+// Compute the style for the fortuneWheel container
 const wheelContainerStyle = computed(() => {
   return {
     width: props.size,
@@ -56,23 +49,27 @@ const wheelContainerStyle = computed(() => {
     transition: "all 3s",
   };
 });
-/*
- fortuneWheel-Base 樣式
-*/
+
+// Compute the style for the fortuneWheel base
 const wheelBaseStyle = computed(() => {
   return { width: props.size, height: props.size };
 });
-/*
- fortuneWheel 開始時的旋轉動畫
-*/
+
+// Compute the initial rotation animation of the fortuneWheel
 const wheelAnimation = computed(() => {
   let nowRotateDeg;
-  // init RotateDeg
-  if (currentRotateDeg.value === 0) nowRotateDeg = -1 * (gridRotate.value / 2);
-  else nowRotateDeg = currentRotateDeg.value;
+
+  // Initialize the rotation angle
+  if (currentRotateDeg.value === 0) {
+    nowRotateDeg = -1 * (gridRotate.value / 2);
+  } else {
+    nowRotateDeg = currentRotateDeg.value;
+  }
+
   return { transform: `rotate(${nowRotateDeg}deg)` };
 });
 
+// Watch for changes in the modelValue prop
 watch(
   () => props.modelValue,
   () => {
@@ -82,8 +79,9 @@ watch(
   }
 );
 
+// Set the new rotation angle for the fortuneWheel
 const setNewRotateDeg = () => {
-  //使 RotateDeg 初始為 3600 的倍數
+  // Make the rotation angle a multiple of 360
   let clearRotateDeg = currentRotateDeg.value - (currentRotateDeg.value % 360);
   let newRotateDeg =
     clearRotateDeg +
@@ -91,8 +89,10 @@ const setNewRotateDeg = () => {
     (props.resultIndex * gridRotate.value + gridRotate.value / 2);
   currentRotateDeg.value = newRotateDeg;
 };
+
+// Trigger the "onEnd" event and update the modelValue after a delay
 const triggerOnEnd = () => {
-  let timer: any = null;
+  let timer: number | null = null;
 
   const promise = new Promise<void>((resolve) => {
     timer = setTimeout(() => {
@@ -100,18 +100,21 @@ const triggerOnEnd = () => {
       resolve();
     }, 3000);
   });
+
   promise.then(() => {
-    clearTimeout(timer);
+    clearTimeout(timer!);
     emit("update:modelValue", false);
   });
 };
 </script>
+
 <style scoped>
 #fortuneWheel-Container {
   position: relative;
   border-radius: 50%;
   overflow: hidden;
 }
+
 #fortuneWheel-Base {
   position: absolute;
   bottom: 50%;

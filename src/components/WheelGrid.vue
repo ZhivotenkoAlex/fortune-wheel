@@ -2,7 +2,13 @@
   <div class="wheelGrid" :style="GridStyle">
     <div class="gridItem-Container" :style="itemContainerStyle">
       <div class="gridItem-Base" :style="itemBaseStyle">
-        {{ gridItem.text }}
+        <!-- {{ "gridItem.text" }} -->
+        <img
+          class="gridItem-Image"
+          width="50"
+          height="100"
+          :src="gridItem.image"
+        />
       </div>
     </div>
   </div>
@@ -18,7 +24,7 @@ const props = defineProps({
   size: { type: String, required: true, default: "100px" },
 });
 /*
-  Grid 的樣式
+  Grid style
 */
 const GridStyle = computed(() => {
   let itemRotate = props.rotate;
@@ -35,7 +41,7 @@ const GridStyle = computed(() => {
   };
 });
 /*
-  GridItem-Container的樣式
+  GridItem-Container style
 */
 const itemContainerStyle = computed(() => {
   let itemSkewY = props.skewY;
@@ -51,7 +57,7 @@ const itemContainerStyle = computed(() => {
 });
 
 /*
-  GridItem-Base 樣式
+  GridItem-Base style
 */
 const itemBaseStyle = computed(() => {
   let stringIndex = props.size.indexOf("px");
@@ -78,9 +84,13 @@ const itemBaseStyle = computed(() => {
 .gridItem-Base {
   position: absolute;
   display: flex;
-  justify-content: start;
+  justify-content: stretch;
   align-items: center;
   padding-left: 10px;
   transform: rotate(90deg);
+}
+.gridItem-Image {
+  transform: rotate(90deg);
+  margin-left: 25px;
 }
 </style>
