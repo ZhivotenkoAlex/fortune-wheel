@@ -2,13 +2,8 @@
   <div class="wheelGrid" :style="GridStyle">
     <div class="gridItem-Container" :style="itemContainerStyle">
       <div class="gridItem-Base" :style="itemBaseStyle">
-        <!-- {{ "gridItem.text" }} -->
-        <img
-          class="gridItem-Image"
-          width="50"
-          height="100"
-          :src="gridItem.image"
-        />
+        {{ gridItem.text }}
+        <img class="gridItem-Image" width="50" :src="gridItem.image" />
       </div>
     </div>
   </div>
