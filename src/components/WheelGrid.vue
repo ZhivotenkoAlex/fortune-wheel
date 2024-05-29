@@ -86,6 +86,8 @@ const itemBaseStyle = computed(() => {
 }
 .gridItem-Image {
   transform: rotate(90deg);
-  margin-left: 25px;
+  margin-left: 5px;
+  height: 60%;
+  width: auto;
 }
 </style>
