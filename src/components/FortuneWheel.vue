@@ -58,6 +58,7 @@ const wheelContainerStyle = computed(() => {
     height: props.size,
     transition: `all ${props.transitionTime}`,
     transitionTimingFunction: "cubic-bezier(0, 0.75, 0.5, 1)",
+    rotate: props.direction === "clockwise" ? "180deg" : 0,
   };
 });
 

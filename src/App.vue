@@ -10,7 +10,7 @@
     <ButtonUi @click="start">Start</ButtonUi>
     <FortuneWheelVue
       v-model="startRotate"
-      :resultIndex="resultIndex"
+      :resultIndex="secondResultIndex"
       :gridData="gridData"
       size="400px"
       @onEnd="onEnd"
@@ -32,7 +32,7 @@ const gridData: Ref<any> = ref([]);
 const resultIndex = ref(1);
 const secondResultIndex = ref(0);
 const startRotate = ref(false);
-for (let index = 1; index <= 12; index++) {
+for (let index = 1; index <= 8; index++) {
   if (index % 3 == 0)
     gridData.value.push({
       text: `${index}`,
@@ -57,9 +57,8 @@ for (let index = 1; index <= 12; index++) {
 }
 const start = () => {
   // index of result item
-  resultIndex.value = 5;
-  secondResultIndex.value = gridData.value.length - resultIndex.value;
-  console.log("🚀 ~ start ~ secondResultIndex:", secondResultIndex);
+  resultIndex.value = 2;
+  secondResultIndex.value = gridData.value.length - resultIndex.value - 1;
   startRotate.value = true;
 };
 const onEnd = () => {
@@ -75,8 +74,6 @@ const onEnd = () => {
   justify-content: center;
   align-items: center;
   gap: 20px;
-  @media screen and (max-width: 1024px) {
-    flex-direction: column;
-  }
+  flex-direction: column;
 }
 </style>
