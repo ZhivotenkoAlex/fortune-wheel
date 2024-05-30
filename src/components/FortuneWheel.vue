@@ -4,11 +4,11 @@
     :style="[wheelContainerStyle, wheelAnimation]"
   >
     <div class="fortuneWheel-Base" :style="wheelBaseStyle">
+      <!-- Iterate over the gridData and render WheelGrid component for each item -->
       <WheelGrid
         v-for="(item, index) in data"
         :key="index"
-        :skewY="gridSkewY"
-        :rotate="index * gridRotate"
+        :rotate="Number(index) * gridRotate"
         :gridItem="item"
         :size="size"
       />
@@ -18,10 +18,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, defineEmits, ref, watch } from "vue";
+import {
+  computed,
+  defineProps,
+  defineEmits,
+  ref,
+  watch,
+  type PropType,
+} from "vue";
 import WheelGrid from "./WheelGrid.vue";
+import { state } from "../socket";
 
-type Direction = "clockwise" | "anticlockwise";
+type Direction = "clockwise" | "counterclockwise";
 
 // Define component props and emits
 const props = defineProps({
@@ -33,23 +41,21 @@ const props = defineProps({
   direction: { type: String as PropType<Direction>, default: "clockwise" },
 });
 
-const data =
-  props.direction === "clockwise"
+// Compute the data based on the direction prop
+const data = computed(() => {
+  return props.direction === "clockwise"
     ? [...props.gridData]
-    : [...props.gridData].reverse();
+    : ([...props.gridData].reverse() as Record<string, any>);
+});
 
+// Define the emits for the component
 const emit = defineEmits(["update:modelValue", "onEnd"]);
+
+// Use a ref to track the current rotation angle
 const currentRotateDeg = ref(0);
 
-// Compute the skewY angle for each wheel grid item
-const gridSkewY = computed(() => {
-  return 90 - 360 / data.length;
-});
-
 // Compute the rotation angle for each wheel grid item
-const gridRotate = computed(() => {
-  return 360 / data.length;
-});
+const gridRotate = computed(() => state.gridData.gridRotate);
 
 // Compute the style for the fortuneWheel container
 const wheelContainerStyle = computed(() => {
@@ -60,7 +66,7 @@ const wheelContainerStyle = computed(() => {
     transitionTimingFunction: "cubic-bezier(0, 0.75, 0.5, 1)",
     rotate: props.direction === "clockwise" ? "180deg" : 0,
   };
-});
+}) as any;
 
 // Compute the style for the fortuneWheel base
 const wheelBaseStyle = computed(() => {
@@ -106,13 +112,13 @@ const setNewRotateDeg = () => {
 
 // Trigger the "onEnd" event and update the modelValue after a delay
 const triggerOnEnd = () => {
-  let timer: number | null = null;
+  let timer: number | null | NodeJS.Timeout = null;
 
   const promise = new Promise<void>((resolve) => {
     timer = setTimeout(() => {
       emit("onEnd");
       resolve();
-    }, 3000);
+    }, 8000);
   });
 
   promise.then(() => {
