@@ -10,12 +10,15 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@vue/cli": "^5.0.8",
     "firebase": "^10.12.2",
     "firebase-functions": "^5.0.1",
+    "gh-pages": "^6.1.1",
     "socket.io-client": "^4.7.5",
     "vue": "^3.2.45"
   },

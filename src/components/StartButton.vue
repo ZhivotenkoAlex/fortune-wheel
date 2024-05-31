@@ -16,6 +16,7 @@
   transition: all 0.3s;
   text-transform: uppercase;
   font-size: large;
+  z-index: 2;
 }
 .btn::before,
 .btn::after {
