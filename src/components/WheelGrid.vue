@@ -69,11 +69,13 @@ const itemBaseStyle = computed(() => {
 </script>
 
 <style scoped>
+/* WheelGrid styles */
 .wheelGrid {
   position: absolute;
   transform-origin: 0 100%;
 }
 
+/* GridItem-Container styles */
 .gridItem-Container {
   position: absolute;
   top: 50%;
@@ -83,6 +85,7 @@ const itemBaseStyle = computed(() => {
   align-items: flex-start;
 }
 
+/* GridItem-Base styles */
 .gridItem-Base {
   position: absolute;
   display: flex;
@@ -92,6 +95,7 @@ const itemBaseStyle = computed(() => {
   transform: rotate(90deg);
 }
 
+/* GridItem-Image styles */
 .gridItem-Image {
   transform: rotate(90deg);
   margin-left: 5px;

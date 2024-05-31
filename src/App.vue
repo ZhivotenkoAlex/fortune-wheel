@@ -1,5 +1,7 @@
 <template>
+  <!-- Header component -->
   <HeaderUI />
+
   <div class="container">
     <div class="wheel_container">
       <!-- First FortuneWheelVue component -->
@@ -10,8 +12,10 @@
         :size="wheelSize"
         @onEnd="onEnd"
       ></FortuneWheelVue>
+
       <!-- Start button -->
       <ButtonUi id="start" @click="start">{{ buttonLabel }}</ButtonUi>
+
       <!-- Second FortuneWheelVue component -->
       <FortuneWheelVue
         v-model="startRotate"
@@ -22,6 +26,12 @@
         transitionTime="5s"
         direction="counterclockwise"
       ></FortuneWheelVue>
+
+      <!-- ModalView component -->
+      <ResultModal
+        :showModal="showModal"
+        @update:showModal="showModal = $event"
+      />
     </div>
   </div>
 </template>
@@ -30,6 +40,7 @@
 import { ref, watch, computed, type Ref, onMounted, onUnmounted } from "vue";
 import FortuneWheelVue from "./components/FortuneWheel.vue";
 import ButtonUi from "./components/StartButton.vue";
+import ResultModal from "./components/ResultModal.vue";
 import HeaderUI from "./components/HeaderUI.vue";
 import { state } from "./socket";
 import { socket } from "./socket";
@@ -41,6 +52,9 @@ const resultIndex = ref(1);
 const secondResultIndex = ref(0);
 const startRotate = ref(false);
 const windowWidth = ref(window.innerWidth);
+const showModal = ref(false);
+
+// Computed property for button label
 const buttonLabel = computed(() => (startRotate.value ? "Stop" : "Start"));
 
 // Function to start the wheel
@@ -54,8 +68,7 @@ const start = () => {
 
 // Function to handle the end of the wheel rotation
 const onEnd = () => {
-  console.log("end");
-  // socket.connect();
+  showModal.value = true;
 };
 
 // Computed properties
@@ -71,16 +84,24 @@ watch(state, (newState) => {
   resultIndex.value = newState.gridData.resultIndex;
   secondResultIndex.value = newState.gridData.resultIndex;
 });
+
+// Function to handle window resize
 const onResize = () => {
   windowWidth.value = window.innerWidth;
 };
+
+// Add event listeners on component mount
 onMounted(() => {
   window.addEventListener("resize", onResize);
 });
+
+// Remove event listeners on component unmount
 onUnmounted(() => {
   window.removeEventListener("resize", onResize);
   socket.disconnect();
 });
+
+// Computed property for wheel size
 const wheelSize = computed(() => {
   if (windowWidth.value > 800) {
     return "350px";
@@ -93,8 +114,6 @@ const wheelSize = computed(() => {
 <style scoped>
 .container {
   overflow: hidden;
-  /* border: 1px solid grey;
-  border-radius: 20px; */
 }
 
 .wheel_container {
@@ -105,10 +124,12 @@ const wheelSize = computed(() => {
   gap: 20px;
   padding: 20px;
 }
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s;
 }
+
 .fade-enter,
 .fade-leave-to {
   opacity: 0;

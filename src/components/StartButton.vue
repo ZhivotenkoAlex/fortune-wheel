@@ -32,7 +32,6 @@
   color: #fff;
   scale: 1.1;
 }
-/* @media screen and (max-width: 1024px) { */
 .btn::before {
   border-width: 0 10px 10px 10px;
   border-color: transparent transparent #e668b2 transparent;
@@ -48,5 +47,4 @@
   left: 50%;
   transform: translate(-50%);
 }
-/* } */
 </style>

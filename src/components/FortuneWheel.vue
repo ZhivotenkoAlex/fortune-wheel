@@ -132,11 +132,16 @@ watch(
       rotationInterval = startRotation();
     } else {
       stopRotation();
-      console.log("🚀 ~ stoppedItemIndex.value:", stoppedItemIndex.value + 1);
-      // triggerOnEnd();
+      storeResult();
     }
   }
 );
+
+const storeResult = () => {
+  props.direction === "clockwise"
+    ? (state.FirstWheelResult = props.gridData[stoppedItemIndex.value] as any)
+    : (state.SecondWheelResult = props.gridData[stoppedItemIndex.value] as any);
+};
 
 // Trigger the "onEnd" event and update the modelValue after a delay
 const triggerOnEnd = () => {
@@ -146,7 +151,7 @@ const triggerOnEnd = () => {
     timer = setTimeout(() => {
       emit("onEnd");
       resolve();
-    }, 3000);
+    }, 5000);
   });
 
   promise.then(() => {
