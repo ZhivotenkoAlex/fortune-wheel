@@ -1,6 +1,6 @@
 <template>
+  <HeaderUI />
   <div class="container">
-    <div class="header"></div>
     <div class="wheel_container">
       <!-- First FortuneWheelVue component -->
       <FortuneWheelVue
@@ -30,6 +30,7 @@
 import { ref, watch, computed, type Ref, onMounted, onUnmounted } from "vue";
 import FortuneWheelVue from "./components/FortuneWheel.vue";
 import ButtonUi from "./components/StartButton.vue";
+import HeaderUI from "./components/HeaderUI.vue";
 import { state } from "./socket";
 import { socket } from "./socket";
 import { isEmpty } from "./helpers";
@@ -92,14 +93,10 @@ const wheelSize = computed(() => {
 <style scoped>
 .container {
   overflow: hidden;
-  border: 1px solid grey;
-  border-radius: 20px;
+  /* border: 1px solid grey;
+  border-radius: 20px; */
 }
-.header {
-  background-color: #01549d;
-  height: 50px;
-  width: 100%;
-}
+
 .wheel_container {
   display: flex;
   justify-content: center;

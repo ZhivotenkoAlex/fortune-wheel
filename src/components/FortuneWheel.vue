@@ -100,7 +100,15 @@ const stopRotation = () => {
     props.direction === "clockwise"
       ? currentRotateDeg.value % 360
       : ((currentRotateDeg.value % 360) + 360) % 360;
-  const adjustment = halfItemRotateDeg - (stoppedAngle % gridRotate.value);
+  let adjustment;
+  if (props.direction === "clockwise") {
+    adjustment = halfItemRotateDeg - (stoppedAngle % gridRotate.value);
+  } else {
+    adjustment = (stoppedAngle % gridRotate.value) - halfItemRotateDeg;
+    if (adjustment < 0) {
+      adjustment += gridRotate.value;
+    }
+  }
   props.direction === "clockwise"
     ? (currentRotateDeg.value += adjustment + 360)
     : (currentRotateDeg.value -= adjustment);
