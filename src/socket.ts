@@ -10,6 +10,10 @@ const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
 
 export const socket = io(URL, { transports: ["websocket"] });
 
+if (!socket.connected) {
+  socket.connect();
+}
+
 socket.on("connect", () => {
   socket.emit("some connection", { for: "everyone" });
   state.connected = true;
