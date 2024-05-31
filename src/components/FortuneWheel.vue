@@ -73,42 +73,62 @@ const wheelBaseStyle = computed(() => {
   return { width: props.size, height: props.size };
 });
 
-// Compute the initial rotation animation of the fortuneWheel
+// Computed property for the wheel animation
 const wheelAnimation = computed(() => {
-  let nowRotateDeg;
+  return { transform: `rotate(${currentRotateDeg.value}deg)` };
+});
 
-  // Initialize the rotation angle
-  if (currentRotateDeg.value === 10) {
-    nowRotateDeg = -1 * (gridRotate.value / 2);
-  } else {
-    nowRotateDeg = currentRotateDeg.value;
-  }
+// Function to start the wheel rotation
+const startRotation = () => {
+  const rotationInterval = setInterval(() => {
+    const speed = props.direction === "clockwise" ? 300 : 200; // Change this value to adjust the speed of the rotation
+    props.direction === "clockwise"
+      ? (currentRotateDeg.value += speed)
+      : (currentRotateDeg.value -= speed); // Change this value to adjust the speed of the rotation
+  }, 100); // Change this value to adjust the frequency of the rotation
 
-  return { transform: `rotate(${nowRotateDeg}deg)` };
+  return rotationInterval;
+};
+
+let rotationInterval: ReturnType<typeof setInterval>;
+
+// Function to stop the wheel rotation
+const stopRotation = () => {
+  clearInterval(rotationInterval);
+  const halfItemRotateDeg = gridRotate.value / 2;
+  const stoppedAngle =
+    props.direction === "clockwise"
+      ? currentRotateDeg.value % 360
+      : ((currentRotateDeg.value % 360) + 360) % 360;
+  const adjustment = halfItemRotateDeg - (stoppedAngle % gridRotate.value);
+  props.direction === "clockwise"
+    ? (currentRotateDeg.value += adjustment + 360)
+    : (currentRotateDeg.value -= adjustment);
+  triggerOnEnd();
+};
+
+const stoppedItemIndex = computed(() => {
+  // The wheel rotates clockwise, so we subtract the rotation angle from 360
+  const stoppedAngle =
+    props.direction === "clockwise"
+      ? 360 - (currentRotateDeg.value % 360)
+      : ((currentRotateDeg.value % 360) + 360) % 360;
+  return Math.floor(stoppedAngle / gridRotate.value);
 });
 
 // Watch for changes in the modelValue prop
 watch(
   () => props.modelValue,
   () => {
-    if (props.modelValue === false) return;
-    setNewRotateDeg();
-    triggerOnEnd();
+    if (props.modelValue === true) {
+      rotationInterval = startRotation();
+    } else {
+      stopRotation();
+      console.log("🚀 ~ stoppedItemIndex.value:", stoppedItemIndex.value + 1);
+      // triggerOnEnd();
+    }
   }
 );
-
-// Set the new rotation angle for the fortuneWheel
-const setNewRotateDeg = () => {
-  // Make the rotation angle a multiple of 360
-  let clearRotateDeg = currentRotateDeg.value - (currentRotateDeg.value % 360);
-  // if direction is clockwise, set the rotation angle to 1, else -1 to make the wheel rotate in the opposite direction
-  let rotateDirection = props.direction === "clockwise" ? 1 : -1;
-  let newRotateDeg =
-    clearRotateDeg +
-    3600 * rotateDirection -
-    (props.resultIndex * gridRotate.value + gridRotate.value / 2);
-  currentRotateDeg.value = newRotateDeg;
-};
 
 // Trigger the "onEnd" event and update the modelValue after a delay
 const triggerOnEnd = () => {
@@ -118,7 +138,7 @@ const triggerOnEnd = () => {
     timer = setTimeout(() => {
       emit("onEnd");
       resolve();
-    }, 8000);
+    }, 3000);
   });
 
   promise.then(() => {

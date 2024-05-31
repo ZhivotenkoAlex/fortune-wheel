@@ -7,17 +7,17 @@
         v-model="startRotate"
         :resultIndex="computedResultIndex"
         :gridData="computedGridData"
-        size="350px"
+        :size="wheelSize"
         @onEnd="onEnd"
       ></FortuneWheelVue>
       <!-- Start button -->
-      <ButtonUi id="start" @click="start">Start</ButtonUi>
+      <ButtonUi id="start" @click="start">{{ buttonLabel }}</ButtonUi>
       <!-- Second FortuneWheelVue component -->
       <FortuneWheelVue
         v-model="startRotate"
         :resultIndex="computedSecondResultIndex"
         :gridData="computedGridData"
-        size="350px"
+        :size="wheelSize"
         @onEnd="onEnd"
         transitionTime="5s"
         direction="counterclockwise"
@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, type Ref } from "vue";
+import { ref, watch, computed, type Ref, onMounted, onUnmounted } from "vue";
 import FortuneWheelVue from "./components/FortuneWheel.vue";
 import ButtonUi from "./components/StartButton.vue";
 import { state } from "./socket";
@@ -39,6 +39,8 @@ const gridData: Ref<any> = ref([]);
 const resultIndex = ref(1);
 const secondResultIndex = ref(0);
 const startRotate = ref(false);
+const windowWidth = ref(window.innerWidth);
+const buttonLabel = computed(() => (startRotate.value ? "Stop" : "Start"));
 
 // Function to start the wheel
 const start = () => {
@@ -46,12 +48,13 @@ const start = () => {
   resultIndex.value = state.gridData.resultIndex;
   secondResultIndex.value = state.gridData.resultIndex;
   gridData.value = state.gridData.gridData;
-  startRotate.value = true;
+  startRotate.value = !startRotate.value;
 };
 
 // Function to handle the end of the wheel rotation
 const onEnd = () => {
-  socket.connect();
+  console.log("end");
+  // socket.connect();
 };
 
 // Computed properties
@@ -66,6 +69,23 @@ watch(state, (newState) => {
     : [...newState!.gridData!.gridData];
   resultIndex.value = newState.gridData.resultIndex;
   secondResultIndex.value = newState.gridData.resultIndex;
+});
+const onResize = () => {
+  windowWidth.value = window.innerWidth;
+};
+onMounted(() => {
+  window.addEventListener("resize", onResize);
+});
+onUnmounted(() => {
+  window.removeEventListener("resize", onResize);
+  socket.disconnect();
+});
+const wheelSize = computed(() => {
+  if (windowWidth.value > 800) {
+    return "350px";
+  } else {
+    return "200px";
+  }
 });
 </script>
 
