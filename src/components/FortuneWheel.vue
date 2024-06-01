@@ -6,7 +6,7 @@
     <div class="fortuneWheel-Base" :style="wheelBaseStyle">
       <!-- Iterate over the gridData and render WheelGrid component for each item -->
       <WheelGrid
-        v-for="(item, index) in data"
+        v-for="(item, index) in gridData"
         :key="index"
         :rotate="Number(index) * gridRotate"
         :gridItem="item"
@@ -18,34 +18,26 @@
 </template>
 
 <script setup lang="ts">
-import {
-  computed,
-  defineProps,
-  defineEmits,
-  ref,
-  watch,
-  type PropType,
-} from "vue";
+import { computed, defineProps, defineEmits, ref, watch } from "vue";
 import WheelGrid from "./WheelGrid.vue";
-import { state } from "../socket";
-
-type Direction = "clockwise" | "counterclockwise";
+import { socket, state, type Data } from "../socket";
 
 // Define component props and emits
 const props = defineProps({
   size: { type: String, required: true, default: "100px" },
-  gridData: { type: Array, required: true, default: () => [] },
+  gridData: { type: Array<Data>, required: true, default: () => [] },
   resultIndex: { type: Number, default: 1 },
   modelValue: { type: Boolean, default: false },
-  transitionTime: { type: String, default: "3s" },
-  direction: { type: String as PropType<Direction>, default: "clockwise" },
+  transitionTime: { type: String, default: "1s" },
+  direction: { type: String, default: "clockwise" },
 });
 
+// Define isClockwise as a ref
+const isClockwise = ref(props.direction === "clockwise");
+
 // Compute the data based on the direction prop
-const data = computed(() => {
-  return props.direction === "clockwise"
-    ? [...props.gridData]
-    : ([...props.gridData].reverse() as Record<string, any>);
+const gridData = computed(() => {
+  return [...props.gridData];
 });
 
 // Define the emits for the component
@@ -64,7 +56,7 @@ const wheelContainerStyle = computed(() => {
     height: props.size,
     transition: `all ${props.transitionTime}`,
     transitionTimingFunction: "cubic-bezier(0, 0.75, 0.5, 1)",
-    rotate: props.direction === "clockwise" ? "180deg" : 0,
+    rotate: isClockwise.value ? "180deg" : 0,
   };
 }) as any;
 
@@ -80,67 +72,12 @@ const wheelAnimation = computed(() => {
 
 // Function to start the wheel rotation
 const startRotation = () => {
-  const rotationInterval = setInterval(() => {
-    const speed = props.direction === "clockwise" ? 300 : 200; // Change this value to adjust the speed of the rotation
-    props.direction === "clockwise"
-      ? (currentRotateDeg.value += speed)
-      : (currentRotateDeg.value -= speed); // Change this value to adjust the speed of the rotation
-  }, 100); // Change this value to adjust the frequency of the rotation
-
-  return rotationInterval;
-};
-
-let rotationInterval: ReturnType<typeof setInterval>;
-
-// Function to stop the wheel rotation
-const stopRotation = () => {
-  clearInterval(rotationInterval);
-  const halfItemRotateDeg = gridRotate.value / 2;
-  const stoppedAngle =
-    props.direction === "clockwise"
-      ? currentRotateDeg.value % 360
-      : ((currentRotateDeg.value % 360) + 360) % 360;
-  let adjustment;
-  if (props.direction === "clockwise") {
-    adjustment = halfItemRotateDeg - (stoppedAngle % gridRotate.value);
-  } else {
-    adjustment = (stoppedAngle % gridRotate.value) - halfItemRotateDeg;
-    if (adjustment < 0) {
-      adjustment += gridRotate.value;
-    }
-  }
-  props.direction === "clockwise"
-    ? (currentRotateDeg.value += adjustment + 360)
-    : (currentRotateDeg.value -= adjustment);
-  triggerOnEnd();
-};
-
-const stoppedItemIndex = computed(() => {
-  // The wheel rotates clockwise, so we subtract the rotation angle from 360
-  const stoppedAngle =
-    props.direction === "clockwise"
-      ? 360 - (currentRotateDeg.value % 360)
-      : ((currentRotateDeg.value % 360) + 360) % 360;
-  return Math.floor(stoppedAngle / gridRotate.value);
-});
-
-// Watch for changes in the modelValue prop
-watch(
-  () => props.modelValue,
-  () => {
-    if (props.modelValue === true) {
-      rotationInterval = startRotation();
-    } else {
-      stopRotation();
-      storeResult();
-    }
-  }
-);
-
-const storeResult = () => {
-  props.direction === "clockwise"
-    ? (state.FirstWheelResult = props.gridData[stoppedItemIndex.value] as any)
-    : (state.SecondWheelResult = props.gridData[stoppedItemIndex.value] as any);
+  const rotationEvent = isClockwise.value
+    ? "wheelRotation"
+    : "negativeWheelRotation";
+  socket.on(rotationEvent, (angle) => {
+    currentRotateDeg.value = angle;
+  });
 };
 
 // Trigger the "onEnd" event and update the modelValue after a delay
@@ -151,13 +88,84 @@ const triggerOnEnd = () => {
     timer = setTimeout(() => {
       emit("onEnd");
       resolve();
-    }, 5000);
+    }, 2000);
   });
 
   promise.then(() => {
     clearTimeout(timer!);
     emit("update:modelValue", false);
   });
+};
+
+// Function to stop the wheel rotation
+const stopRotation = () => {
+  const rotationEvent = isClockwise.value
+    ? "wheelRotation"
+    : "negativeWheelRotation";
+  socket.off(rotationEvent);
+
+  if (isClockwise.value) {
+    socket.emit("getAdjustedAngle", {
+      angle: currentRotateDeg.value,
+      greedRotate: gridRotate.value,
+      isClockwise: true,
+    });
+    socket.once("adjustedAngle", (adjustedData) => {
+      currentRotateDeg.value = adjustedData;
+    });
+  } else {
+    socket.emit("getAdjustedNegativeAngle", {
+      angle: currentRotateDeg.value,
+      greedRotate: gridRotate.value,
+      isClockwise: false,
+    });
+    socket.once("adjustedNegativeAngle", (adjustedData) => {
+      currentRotateDeg.value = adjustedData;
+    });
+  }
+
+  triggerOnEnd();
+};
+
+// Watch for changes in the modelValue prop
+watch(
+  () => props.modelValue,
+  () => {
+    if (props.modelValue === true) {
+      startRotation();
+    } else {
+      stopRotation();
+      storeResult();
+    }
+  }
+);
+
+// Watch the direction prop and update isClockwise when it changes
+watch(props, (newProps) => {
+  isClockwise.value = newProps.direction === "clockwise";
+});
+
+// Function to store the result based on the rotation direction
+const storeResult = () => {
+  if (isClockwise.value) {
+    socket.emit("getFirstFinishIndex", {
+      rotateDeg: currentRotateDeg.value,
+      isClockwise: true,
+      gridRotate: gridRotate.value,
+    });
+    socket.once("firstFinishIndex", (index) => {
+      state.FirstWheelResult = props.gridData[index] as any;
+    });
+  } else {
+    socket.emit("getSecondFinishIndex", {
+      rotateDeg: currentRotateDeg.value,
+      isClockwise: false,
+      gridRotate: gridRotate.value,
+    });
+    socket.once("secondFinishIndex", (index) => {
+      state.SecondWheelResult = props.gridData[index] as any;
+    });
+  }
 };
 </script>
 

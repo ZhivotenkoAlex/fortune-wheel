@@ -23,7 +23,6 @@
         :gridData="computedGridData"
         :size="wheelSize"
         @onEnd="onEnd"
-        transitionTime="5s"
         direction="counterclockwise"
       ></FortuneWheelVue>
 
@@ -59,7 +58,7 @@ const buttonLabel = computed(() => (startRotate.value ? "Stop" : "Start"));
 
 // Function to start the wheel
 const start = () => {
-  socket.disconnect();
+  socket.off("message");
   resultIndex.value = state.gridData.resultIndex;
   secondResultIndex.value = state.gridData.resultIndex;
   gridData.value = state.gridData.gridData;
@@ -103,10 +102,10 @@ onUnmounted(() => {
 
 // Computed property for wheel size
 const wheelSize = computed(() => {
-  if (windowWidth.value > 800) {
+  if (windowWidth.value > 768) {
     return "350px";
   } else {
-    return "200px";
+    return "250px";
   }
 });
 </script>

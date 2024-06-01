@@ -7,10 +7,12 @@ export const state = reactive({
   gridData: {} as Data,
   FirstWheelResult: null as DataItem | null,
   SecondWheelResult: null as DataItem | null,
+  wheelRotation: null as number | null,
 });
 
 // Define the URL for the socket connection
 const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
+// const URL = "http://localhost:5001";
 
 // Create a socket instance and connect to the server
 export const socket: Socket = io(URL, { transports: ["websocket"] });
@@ -35,7 +37,7 @@ socket.on("message", (data: Data) => {
 });
 
 // Define the types for the data objects
-type Data = {
+export type Data = {
   gridData: DataItem[];
   gridRotate: number;
   gridSkewY: number;
@@ -49,4 +51,5 @@ type DataItem = {
   text: string;
   bgColor: string;
   fontColor: string;
+  image: string;
 };
