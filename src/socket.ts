@@ -41,7 +41,6 @@ socket.on("getData", (data: Data) => {
   socket.emit("ping", () => {
     const duration = Date.now() - start;
     state.ping = duration;
-    console.log("duration", duration);
   });
 });
 
