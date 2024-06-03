@@ -15,7 +15,6 @@ export const state = reactive({
 const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
 // const URL = "http://localhost:5001";
 
-// Create a socket instance and connect to the server
 export const socket: Socket = io(URL, { transports: ["websocket"] });
 
 // Check if the socket is not already connected, then connect
@@ -23,20 +22,16 @@ if (!socket.connected) {
   socket.connect();
 }
 
-// Event handler for when the socket is connected
 socket.on("connect", () => {
-  // Emit a "some connection" event to the server
   socket.emit("some connection", { for: "everyone" });
-  // Update the state to indicate that the socket is connected
   state.connected = true;
 });
 
-// Event handler for receiving a "getData" event from the server
-socket.on("getData", (data: Data) => {
-  // Update the state with the received data
-  state.gridData = data;
+let start: number;
 
-  const start = Date.now();
+socket.on("getData", (data: Data) => {
+  state.gridData = data;
+  start = Date.now();
 
   socket.emit("ping", () => {
     const duration = Date.now() - start;

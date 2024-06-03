@@ -5,7 +5,7 @@ import vue from "@vitejs/plugin-vue";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/fortune-wheel",
+  base: "/fortune-wheel/",
   plugins: [vue()],
   resolve: {
     alias: {
