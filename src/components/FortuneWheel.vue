@@ -1,7 +1,8 @@
 <template>
   <div
     class="fortuneWheel-Container"
-    :style="[wheelContainerStyle, wheelAnimation]"
+    :style="wheelContainerStyle"
+    ref="wheelRef"
   >
     <div class="fortuneWheel-Base" :style="wheelBaseStyle">
       <!-- Iterate over the gridData and render WheelGrid component for each item -->
@@ -33,13 +34,17 @@ const props = defineProps({
 
 // Define isClockwise as a ref
 const isClockwise = ref(props.direction === "clockwise");
-const transitionTime = ref("0.3s");
+// const transitionTime = ref("0s");
+
+const wheelRef = ref(null) as any;
 
 // Compute the data based on the direction prop
 const gridData = computed(() => {
   const data = [...props.gridData];
   return isClockwise.value ? data : [...data].reverse();
 });
+
+let animationFrameId = null as any;
 
 // Define the emits for the component
 const emit = defineEmits(["update:modelValue", "onEnd"]);
@@ -50,13 +55,45 @@ const currentRotateDeg = ref(0);
 // Compute the rotation angle for each wheel grid item
 const gridRotate = computed(() => state.gridData.gridRotate);
 
+const animateRotation = () => {
+  // Update the wheel's rotation
+  if (wheelRef.value) {
+    wheelRef.value.style.transform = `rotate(${currentRotateDeg.value}deg)`;
+  }
+
+  // Request the next animation frame
+  animationFrameId = window.requestAnimationFrame(animateRotation);
+};
+
+// Function to start the wheel rotation
+const startRotation = () => {
+  // Start the animation
+  const rotationEvent = isClockwise.value
+    ? "wheelRotation"
+    : "negativeWheelRotation";
+  socket.on(rotationEvent, (angle) => {
+    currentRotateDeg.value = angle;
+  });
+  animationFrameId = window.requestAnimationFrame(animateRotation);
+};
+
+// Function to stop the wheel rotation
+const stopRotation = () => {
+  // Cancel the animation
+  const rotationEvent = isClockwise.value
+    ? "wheelRotation"
+    : "negativeWheelRotation";
+  socket.off(rotationEvent);
+  window.cancelAnimationFrame(animationFrameId);
+  animationFrameId = null;
+  triggerOnEnd();
+};
+
 // Compute the style for the fortuneWheel container
 const wheelContainerStyle = computed(() => {
   return {
     width: props.size,
     height: props.size,
-    transition: `all ${transitionTime.value}`,
-    transitionTimingFunction: "cubic-bezier(0, 0.75, 0.5, 1)",
     rotate: isClockwise.value ? "180deg" : "0deg",
   };
 });
@@ -66,34 +103,6 @@ const wheelBaseStyle = computed(() => {
   return { width: props.size, height: props.size };
 });
 
-// Computed property for the wheel animation
-const wheelAnimation = computed(() => {
-  return { transform: `rotate(${currentRotateDeg.value}deg)` };
-});
-
-// Function to start the wheel rotation
-const startRotation = () => {
-  const rotationEvent = isClockwise.value
-    ? "wheelRotation"
-    : "negativeWheelRotation";
-  socket.on(rotationEvent, (angle) => {
-    currentRotateDeg.value = angle;
-  });
-};
-
-// Function to stop the wheel rotation
-const stopRotation = () => {
-  window.requestAnimationFrame(() => {
-    transitionTime.value = "0,3s";
-    const rotationEvent = isClockwise.value
-      ? "wheelRotation"
-      : "negativeWheelRotation";
-    socket.off(rotationEvent);
-  });
-
-  triggerOnEnd();
-};
-
 // Trigger the "onEnd" event and update the modelValue after a delay
 const triggerOnEnd = () => {
   let timer: number | null | NodeJS.Timeout = null;
@@ -102,7 +111,7 @@ const triggerOnEnd = () => {
     timer = setTimeout(() => {
       emit("onEnd");
       resolve();
-    }, 2000);
+    }, 1000);
   });
 
   promise.then(() => {
@@ -132,20 +141,12 @@ watch(props, (newProps) => {
 // Function to store the result based on the rotation direction
 const storeResult = () => {
   if (isClockwise.value) {
-    socket.emit("getFirstFinishIndex", {
-      rotateDeg: currentRotateDeg.value,
-      isClockwise: true,
-      gridRotate: gridRotate.value,
-    });
+    socket.emit("getFirstFinishIndex");
     socket.once("firstFinishIndex", (index) => {
       state.FirstWheelResult = props.gridData[index] as any;
     });
   } else {
-    socket.emit("getSecondFinishIndex", {
-      rotateDeg: currentRotateDeg.value,
-      isClockwise: false,
-      gridRotate: gridRotate.value,
-    });
+    socket.emit("getSecondFinishIndex");
     socket.once("secondFinishIndex", (index) => {
       state.SecondWheelResult = props.gridData[index] as any;
     });

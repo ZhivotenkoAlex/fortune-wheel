@@ -58,9 +58,7 @@ const buttonLabel = computed(() => (startRotate.value ? "Stop" : "Start"));
 
 // Function to start the wheel
 const start = () => {
-  socket.off("message");
-  resultIndex.value = state.gridData.resultIndex;
-  secondResultIndex.value = state.gridData.resultIndex;
+  socket.off("getData");
   gridData.value = state.gridData.gridData;
   startRotate.value = !startRotate.value;
 };
@@ -68,6 +66,7 @@ const start = () => {
 // Function to handle the end of the wheel rotation
 const onEnd = () => {
   showModal.value = true;
+  socket.off("getData");
 };
 
 // Computed properties
@@ -80,8 +79,6 @@ watch(state, (newState) => {
   gridData.value = isEmpty(newState.gridData.gridData)
     ? []
     : [...newState!.gridData!.gridData];
-  resultIndex.value = newState.gridData.resultIndex;
-  secondResultIndex.value = newState.gridData.resultIndex;
 });
 
 // Function to handle window resize

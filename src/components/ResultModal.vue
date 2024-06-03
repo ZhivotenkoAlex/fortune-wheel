@@ -69,7 +69,7 @@ defineProps({
 // Function to close the modal
 const closeModal = () => {
   emit("update:showModal", false);
-  socket.on("message", (data) => {
+  socket.on("getData", (data) => {
     state.gridData = data;
   });
 };
