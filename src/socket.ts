@@ -31,8 +31,8 @@ socket.on("connect", () => {
   state.connected = true;
 });
 
-// Event handler for receiving a "message" event from the server
-socket.on("message", (data: Data) => {
+// Event handler for receiving a "getData" event from the server
+socket.on("getData", (data: Data) => {
   // Update the state with the received data
   state.gridData = data;
 
@@ -50,10 +50,6 @@ export type Data = {
   gridData: DataItem[];
   gridRotate: number;
   gridSkewY: number;
-  resultIndex: number;
-  secondResultIndex: number;
-  transitionTime_1: string;
-  transitionTime_2: string;
 };
 
 type DataItem = {
