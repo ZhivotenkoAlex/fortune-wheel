@@ -36,14 +36,14 @@ const images: Record<string, string> = {
 };
 
 // Compute the result of the first wheel
-const firstWheel = computed(() => state.FirstWheelResult);
+const firstWheel = computed(() => state.firstWheelResult);
 
 const image = computed(() => {
   return images[firstWheel.value?.image as string];
 });
 
 // Compute the result of the second wheel
-const secondWheel = computed(() => state.SecondWheelResult);
+const secondWheel = computed(() => state.secondWheelResult);
 
 // Compute whether the player is a winner or not
 const isWinner = computed(() => {

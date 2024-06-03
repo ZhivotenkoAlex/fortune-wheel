@@ -7,8 +7,6 @@
       <!-- First FortuneWheelVue component -->
       <FortuneWheelVue
         v-model="startRotate"
-        :resultIndex="computedResultIndex"
-        :gridData="computedGridData"
         :size="wheelSize"
         @onEnd="onEnd"
       ></FortuneWheelVue>
@@ -19,8 +17,6 @@
       <!-- Second FortuneWheelVue component -->
       <FortuneWheelVue
         v-model="startRotate"
-        :resultIndex="computedSecondResultIndex"
-        :gridData="computedGridData"
         :size="wheelSize"
         @onEnd="onEnd"
         direction="counterclockwise"
@@ -47,8 +43,7 @@ import { isEmpty } from "./helpers";
 
 // Define reactive variables using ref()
 const gridData: Ref<any> = ref([]);
-const resultIndex = ref(1);
-const secondResultIndex = ref(0);
+
 const startRotate = ref(false);
 const windowWidth = ref(window.innerWidth);
 const showModal = ref(false);
@@ -68,11 +63,6 @@ const onEnd = () => {
   showModal.value = true;
   socket.off("getData");
 };
-
-// Computed properties
-const computedGridData = computed(() => gridData.value);
-const computedResultIndex = computed(() => resultIndex.value);
-const computedSecondResultIndex = computed(() => secondResultIndex.value);
 
 // Watch for changes in the state object
 watch(state, (newState) => {

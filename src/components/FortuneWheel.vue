@@ -7,7 +7,7 @@
     <div class="fortuneWheel-Base" :style="wheelBaseStyle">
       <!-- Iterate over the gridData and render WheelGrid component for each item -->
       <WheelGrid
-        v-for="(item, index) in gridData"
+        v-for="(item, index) in data"
         :key="index"
         :rotate="Number(index) * gridRotate"
         :gridItem="item"
@@ -21,13 +21,11 @@
 <script setup lang="ts">
 import { computed, defineProps, defineEmits, ref, watch } from "vue";
 import WheelGrid from "./WheelGrid.vue";
-import { socket, state, type Data } from "../socket";
+import { socket, state } from "../socket";
 
 // Define component props and emits
 const props = defineProps({
   size: { type: String, required: true, default: "100px" },
-  gridData: { type: Array<Data>, required: true, default: () => [] },
-  resultIndex: { type: Number, default: 1 },
   modelValue: { type: Boolean, default: false },
   direction: { type: String, default: "clockwise" },
 });
@@ -39,9 +37,9 @@ const isClockwise = ref(props.direction === "clockwise");
 const wheelRef = ref(null) as any;
 
 // Compute the data based on the direction prop
-const gridData = computed(() => {
-  const data = [...props.gridData];
-  return isClockwise.value ? data : [...data].reverse();
+const data = computed(() => {
+  const data = state.gridData.gridData ?? [];
+  return isClockwise.value ? [...data] : [...data].reverse();
 });
 
 let animationFrameId = null as any;
@@ -143,12 +141,17 @@ const storeResult = () => {
   if (isClockwise.value) {
     socket.emit("getFirstFinishIndex");
     socket.once("firstFinishIndex", (index) => {
-      state.FirstWheelResult = props.gridData[index] as any;
+      console.log(data.value);
+      console.log(index);
+      state.firstWheelResult = data.value[index] as any;
     });
   } else {
     socket.emit("getSecondFinishIndex");
+
     socket.once("secondFinishIndex", (index) => {
-      state.SecondWheelResult = props.gridData[index] as any;
+      console.log(data.value);
+      console.log(index);
+      state.secondWheelResult = data.value[index] as any;
     });
   }
 };
