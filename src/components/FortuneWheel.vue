@@ -141,16 +141,12 @@ const storeResult = () => {
   if (isClockwise.value) {
     socket.emit("getFirstFinishIndex");
     socket.once("firstFinishIndex", (index) => {
-      console.log(data.value);
-      console.log(index);
       state.firstWheelResult = data.value[index] as any;
     });
   } else {
     socket.emit("getSecondFinishIndex");
 
     socket.once("secondFinishIndex", (index) => {
-      console.log(data.value);
-      console.log(index);
       state.secondWheelResult = data.value[index] as any;
     });
   }
