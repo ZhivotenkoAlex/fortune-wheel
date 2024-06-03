@@ -28,16 +28,17 @@ const props = defineProps({
   gridData: { type: Array<Data>, required: true, default: () => [] },
   resultIndex: { type: Number, default: 1 },
   modelValue: { type: Boolean, default: false },
-  transitionTime: { type: String, default: "1s" },
   direction: { type: String, default: "clockwise" },
 });
 
 // Define isClockwise as a ref
 const isClockwise = ref(props.direction === "clockwise");
+const transitionTime = ref("0.3s");
 
 // Compute the data based on the direction prop
 const gridData = computed(() => {
-  return [...props.gridData];
+  const data = [...props.gridData];
+  return isClockwise.value ? data : [...data].reverse();
 });
 
 // Define the emits for the component
@@ -54,11 +55,11 @@ const wheelContainerStyle = computed(() => {
   return {
     width: props.size,
     height: props.size,
-    transition: `all ${props.transitionTime}`,
+    transition: `all ${transitionTime.value}`,
     transitionTimingFunction: "cubic-bezier(0, 0.75, 0.5, 1)",
-    rotate: isClockwise.value ? "180deg" : 0,
+    rotate: isClockwise.value ? "180deg" : "0deg",
   };
-}) as any;
+});
 
 // Compute the style for the fortuneWheel base
 const wheelBaseStyle = computed(() => {
@@ -80,6 +81,19 @@ const startRotation = () => {
   });
 };
 
+// Function to stop the wheel rotation
+const stopRotation = () => {
+  window.requestAnimationFrame(() => {
+    transitionTime.value = "0,3s";
+    const rotationEvent = isClockwise.value
+      ? "wheelRotation"
+      : "negativeWheelRotation";
+    socket.off(rotationEvent);
+  });
+
+  triggerOnEnd();
+};
+
 // Trigger the "onEnd" event and update the modelValue after a delay
 const triggerOnEnd = () => {
   let timer: number | null | NodeJS.Timeout = null;
@@ -95,36 +109,6 @@ const triggerOnEnd = () => {
     clearTimeout(timer!);
     emit("update:modelValue", false);
   });
-};
-
-// Function to stop the wheel rotation
-const stopRotation = () => {
-  const rotationEvent = isClockwise.value
-    ? "wheelRotation"
-    : "negativeWheelRotation";
-  socket.off(rotationEvent);
-
-  if (isClockwise.value) {
-    socket.emit("getAdjustedAngle", {
-      angle: currentRotateDeg.value,
-      greedRotate: gridRotate.value,
-      isClockwise: true,
-    });
-    socket.once("adjustedAngle", (adjustedData) => {
-      currentRotateDeg.value = adjustedData;
-    });
-  } else {
-    socket.emit("getAdjustedNegativeAngle", {
-      angle: currentRotateDeg.value,
-      greedRotate: gridRotate.value,
-      isClockwise: false,
-    });
-    socket.once("adjustedNegativeAngle", (adjustedData) => {
-      currentRotateDeg.value = adjustedData;
-    });
-  }
-
-  triggerOnEnd();
 };
 
 // Watch for changes in the modelValue prop
