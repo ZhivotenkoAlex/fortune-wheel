@@ -8,6 +8,7 @@ export const state = reactive({
   FirstWheelResult: null as DataItem | null,
   SecondWheelResult: null as DataItem | null,
   wheelRotation: null as number | null,
+  ping: null as number | null,
 });
 
 // Define the URL for the socket connection
@@ -34,6 +35,14 @@ socket.on("connect", () => {
 socket.on("message", (data: Data) => {
   // Update the state with the received data
   state.gridData = data;
+
+  const start = Date.now();
+
+  socket.emit("ping", () => {
+    const duration = Date.now() - start;
+    state.ping = duration;
+    console.log("duration", duration);
+  });
 });
 
 // Define the types for the data objects
