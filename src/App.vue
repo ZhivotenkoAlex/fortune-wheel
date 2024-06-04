@@ -2,31 +2,34 @@
   <!-- Header component -->
   <HeaderUI />
 
-  <div class="container">
-    <div class="wheel_container">
-      <!-- First FortuneWheelVue component -->
-      <FortuneWheelVue
-        v-model="startRotate"
-        :size="wheelSize"
-        @onEnd="onEnd"
-      ></FortuneWheelVue>
+  <div class="root">
+    <div class="container">
+      <div v-if="!isLoaded" class="loader"></div>
+      <div v-else class="wheel_container">
+        <!-- First FortuneWheelVue component -->
+        <FortuneWheelVue
+          v-model="startRotate"
+          :size="wheelSize"
+          @onEnd="onEnd"
+        ></FortuneWheelVue>
 
-      <!-- Start button -->
-      <ButtonUi id="start" @click="start">{{ buttonLabel }}</ButtonUi>
+        <!-- Start button -->
+        <ButtonUi id="start" @click="start">{{ buttonLabel }} </ButtonUi>
 
-      <!-- Second FortuneWheelVue component -->
-      <FortuneWheelVue
-        v-model="startRotate"
-        :size="wheelSize"
-        @onEnd="onEnd"
-        direction="counterclockwise"
-      ></FortuneWheelVue>
+        <!-- Second FortuneWheelVue component -->
+        <FortuneWheelVue
+          v-model="startRotate"
+          :size="wheelSize"
+          @onEnd="onEnd"
+          direction="counterclockwise"
+        ></FortuneWheelVue>
 
-      <!-- ModalView component -->
-      <ResultModal
-        :showModal="showModal"
-        @update:showModal="showModal = $event"
-      />
+        <!-- ModalView component -->
+        <ResultModal
+          :showModal="showModal"
+          @update:showModal="showModal = $event"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -39,10 +42,11 @@ import ResultModal from "./components/ResultModal.vue";
 import HeaderUI from "./components/HeaderUI.vue";
 import { state } from "./socket";
 import { socket } from "./socket";
-import { isEmpty } from "./helpers";
+import { isEmpty, images } from "./helpers";
 
 // Define reactive variables using ref()
 const gridData: Ref<any> = ref([]);
+const isLoaded = ref(false);
 
 const startRotate = ref(false);
 const windowWidth = ref(window.innerWidth);
@@ -70,6 +74,30 @@ watch(state, (newState) => {
   gridData.value = isEmpty(newState.gridData.gridData)
     ? []
     : [...newState!.gridData!.gridData];
+
+  let imagePromises = [] as any;
+
+  if (
+    newState.gridData?.gridData &&
+    Array.isArray(newState.gridData?.gridData)
+  ) {
+    imagePromises = newState.gridData.gridData.map((item) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = images[item.image];
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+    });
+  }
+
+  Promise.all(imagePromises)
+    .then(() => {
+      isLoaded.value = true;
+    })
+    .catch((error) => {
+      console.error("Error loading images:", error);
+    });
 });
 
 // Function to handle window resize
@@ -99,17 +127,22 @@ const wheelSize = computed(() => {
 </script>
 
 <style scoped>
-.container {
+.root {
   overflow: hidden;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
 }
 
 .wheel_container {
   display: flex;
-  justify-content: center;
   align-items: center;
   flex-direction: column;
   gap: 20px;
-  padding: 20px;
 }
 
 .fade-enter-active,
@@ -120,5 +153,23 @@ const wheelSize = computed(() => {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

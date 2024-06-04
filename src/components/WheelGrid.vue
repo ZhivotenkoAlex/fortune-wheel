@@ -12,9 +12,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { state } from "../socket";
-import dairy_milk from "../assets/dairy_milk.png";
-import rice_cake from "../assets/rice_cake.png";
-import truffle_lindt from "../assets/truffle_lindt.png";
+import { images } from "@/helpers";
 
 // Define component props
 const props = defineProps({
@@ -23,17 +21,8 @@ const props = defineProps({
   size: { type: String, required: true, default: "100px" },
 });
 
-const images: Record<string, string> = {
-  dairy_milk: dairy_milk,
-  rice_cake: rice_cake,
-  truffle_lindt: truffle_lindt,
-};
 const image = images[props.gridItem.image];
 
-/*
-  Grid style
-  - Computes the style for the grid element
-*/
 const gridStyle = computed(() => {
   const itemRotate = props.rotate;
   const itemSkewY = state.gridData.gridSkewY;
@@ -49,10 +38,6 @@ const gridStyle = computed(() => {
   };
 });
 
-/*
-  GridItem-Container style
-  - Computes the style for the container of the grid item
-*/
 const itemContainerStyle = computed(() => {
   const itemSkewY = state.gridData.gridSkewY;
   const contentSkewY = itemSkewY;
@@ -66,10 +51,6 @@ const itemContainerStyle = computed(() => {
   };
 });
 
-/*
-  GridItem-Base style
-  - Computes the style for the base of the grid item
-*/
 const itemBaseStyle = computed(() => {
   const stringIndex = props.size.indexOf("px");
   const extractNumber = props.size.slice(0, stringIndex + 1);
@@ -79,13 +60,11 @@ const itemBaseStyle = computed(() => {
 </script>
 
 <style scoped>
-/* WheelGrid styles */
 .wheelGrid {
   position: absolute;
   transform-origin: 0 100%;
 }
 
-/* GridItem-Container styles */
 .gridItem-Container {
   position: absolute;
   top: 50%;
@@ -95,7 +74,6 @@ const itemBaseStyle = computed(() => {
   align-items: flex-start;
 }
 
-/* GridItem-Base styles */
 .gridItem-Base {
   position: absolute;
   display: flex;
@@ -105,12 +83,9 @@ const itemBaseStyle = computed(() => {
   transform: rotate(90deg);
 }
 
-/* GridItem-Image styles */
 .gridItem-Image {
   transform: rotate(90deg);
   margin-left: 5px;
-  /* height: 60%;
-  width: auto; */
   height: 65px;
   width: 45px;
   object-fit: cover;
