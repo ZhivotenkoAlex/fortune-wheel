@@ -11,7 +11,7 @@ import { state } from "@/socket";
 import { computed } from "vue";
 
 const ping = computed(() => state.ping + "ms");
-const isHighPing = computed(() => state.ping !== null && state.ping > 100);
+const isHighPing = computed(() => state.ping !== null && state.ping > 200);
 </script>
 <style scoped>
 .header {
