@@ -12,8 +12,8 @@ export const state = reactive({
 });
 
 // Define the URL for the socket connection
-// const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
-const URL = "http://localhost:5001";
+const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
+// const URL = "http://localhost:5001";
 
 export const socket: Socket = io(URL, { transports: ["websocket"] });
 
