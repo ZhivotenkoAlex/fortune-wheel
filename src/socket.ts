@@ -5,15 +5,15 @@ import { io, Socket } from "socket.io-client";
 export const state = reactive({
   connected: false,
   gridData: {} as Data,
-  firstWheelResult: null as DataItem | null,
-  secondWheelResult: null as DataItem | null,
+  firstWheelResult: null as number | null,
+  secondWheelResult: null as number | null,
   wheelRotation: null as number | null,
   ping: null as number | null,
 });
 
 // Define the URL for the socket connection
-const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
-// const URL = "http://localhost:5001";
+// const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
+const URL = "http://localhost:5001";
 
 export const socket: Socket = io(URL, { transports: ["websocket"] });
 

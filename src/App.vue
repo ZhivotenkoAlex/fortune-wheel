@@ -54,6 +54,7 @@ const buttonLabel = computed(() => (startRotate.value ? "Stop" : "Start"));
 // Function to start the wheel
 const start = () => {
   socket.off("getData");
+  socket.emit("startRotation");
   gridData.value = state.gridData.gridData;
   startRotate.value = !startRotate.value;
 };
@@ -61,7 +62,7 @@ const start = () => {
 // Function to handle the end of the wheel rotation
 const onEnd = () => {
   showModal.value = true;
-  socket.off("getData");
+  socket.emit("pauseRotation");
 };
 
 // Watch for changes in the state object

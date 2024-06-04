@@ -139,15 +139,19 @@ watch(props, (newProps) => {
 // Function to store the result based on the rotation direction
 const storeResult = () => {
   if (isClockwise.value) {
-    socket.emit("getFirstFinishIndex");
+    socket.emit("getFirstFinishIndex", {
+      rotateDeg: currentRotateDeg.value,
+    });
     socket.once("firstFinishIndex", (index) => {
-      state.firstWheelResult = data.value[index] as any;
+      state.firstWheelResult = index;
     });
   } else {
-    socket.emit("getSecondFinishIndex");
+    socket.emit("getSecondFinishIndex", {
+      rotateDeg: currentRotateDeg.value,
+    });
 
     socket.once("secondFinishIndex", (index) => {
-      state.secondWheelResult = data.value[index] as any;
+      state.secondWheelResult = index;
     });
   }
 };

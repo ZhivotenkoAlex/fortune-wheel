@@ -6,10 +6,10 @@
       <div class="container">
         <div class="description">
           <!-- Display the result of the first wheel -->
-          <p>Result of the first wheel is {{ firstWheel?.text }}</p>
+          <p>Result of the first wheel is {{ firstWheel?.text ?? "" }}</p>
 
           <!-- Display the result of the second wheel -->
-          <p>Result of the second wheel is {{ secondWheel?.text }}</p>
+          <p>Result of the second wheel is {{ secondWheel?.text ?? "" }}</p>
         </div>
         <div>
           <img v-if="isWinner" class="image" width="100" :src="image" />
@@ -36,18 +36,30 @@ const images: Record<string, string> = {
 };
 
 // Compute the result of the first wheel
-const firstWheel = computed(() => state.firstWheelResult);
+const firstWheel = computed(() => {
+  const firstWheelIndex = state.firstWheelResult;
+  const result =
+    firstWheelIndex !== null ? state.gridData.gridData[firstWheelIndex] : null;
+  return result;
+});
+
+// Compute the result of the second wheel
+const secondWheel = computed(() => {
+  const secondWheelIndex = state.secondWheelResult;
+  const result =
+    secondWheelIndex !== null
+      ? state.gridData.gridData[secondWheelIndex]
+      : null;
+  return result;
+});
 
 const image = computed(() => {
   return images[firstWheel.value?.image as string];
 });
 
-// Compute the result of the second wheel
-const secondWheel = computed(() => state.secondWheelResult);
-
 // Compute whether the player is a winner or not
 const isWinner = computed(() => {
-  return firstWheel.value?.text === secondWheel.value?.text;
+  return state.firstWheelResult === state.secondWheelResult;
 });
 
 // Define the emit function to emit events
@@ -70,10 +82,15 @@ defineProps({
 const closeModal = () => {
   emit("update:showModal", false);
   let start = Date.now();
+  socket.emit("updateData");
+  socket.once("getData", (data: any) => {
+    state.gridData = data;
+    start = Date.now();
 
-  socket.emit("ping", () => {
-    const duration = Date.now() - start;
-    state.ping = duration;
+    socket.emit("ping", () => {
+      const duration = Date.now() - start;
+      state.ping = duration;
+    });
   });
 };
 </script>
