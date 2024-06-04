@@ -69,8 +69,11 @@ defineProps({
 // Function to close the modal
 const closeModal = () => {
   emit("update:showModal", false);
-  socket.on("getData", (data) => {
-    state.gridData = data;
+  let start = Date.now();
+
+  socket.emit("ping", () => {
+    const duration = Date.now() - start;
+    state.ping = duration;
   });
 };
 </script>
