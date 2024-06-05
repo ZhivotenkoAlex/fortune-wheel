@@ -10,11 +10,12 @@ export const state = reactive({
   wheelRotation: null as number | null,
   ping: null as number | null,
   isLoaded: false,
+  userId: null as string | null,
 });
 
 // Define the URL for the socket connection
-const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
-// const URL = "http://localhost:5001";
+// const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
+const URL = "http://localhost:5001";
 
 export const socket: Socket = io(URL, { transports: ["websocket"] });
 
@@ -40,14 +41,13 @@ socket.on("getData", (data: Data) => {
   });
 });
 
-// Define the types for the data objects
 export type Data = {
   gridData: DataItem[];
   gridRotate: number;
   gridSkewY: number;
 };
 
-type DataItem = {
+export type DataItem = {
   text: string;
   bgColor: string;
   fontColor: string;

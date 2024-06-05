@@ -4,31 +4,37 @@
 
   <div class="root">
     <div class="container">
-      <div v-if="!isLoaded" class="loader"></div>
-      <div v-else class="wheel_container">
-        <!-- First FortuneWheelVue component -->
-        <FortuneWheelVue
-          v-model="startRotate"
-          :size="wheelSize"
-          @onEnd="onEnd"
-        ></FortuneWheelVue>
+      <div v-if="!isLoaded && isValidToken === null" class="loader"></div>
+      <div v-else>
+        <div v-if="isValidToken === false">No Access</div>
+        <div
+          v-else-if="isLoaded && isValidToken === true"
+          class="wheel_container"
+        >
+          <!-- First FortuneWheelVue component -->
+          <FortuneWheelVue
+            v-model="startRotate"
+            :size="wheelSize"
+            @onEnd="onEnd"
+          ></FortuneWheelVue>
 
-        <!-- Start button -->
-        <ButtonUi id="start" @click="start">{{ buttonLabel }} </ButtonUi>
+          <!-- Start button -->
+          <ButtonUi id="start" @click="start">{{ buttonLabel }} </ButtonUi>
 
-        <!-- Second FortuneWheelVue component -->
-        <FortuneWheelVue
-          v-model="startRotate"
-          :size="wheelSize"
-          @onEnd="onEnd"
-          direction="counterclockwise"
-        ></FortuneWheelVue>
+          <!-- Second FortuneWheelVue component -->
+          <FortuneWheelVue
+            v-model="startRotate"
+            :size="wheelSize"
+            @onEnd="onEnd"
+            direction="counterclockwise"
+          ></FortuneWheelVue>
 
-        <!-- ModalView component -->
-        <ResultModal
-          :showModal="showModal"
-          @update:showModal="showModal = $event"
-        />
+          <!-- ModalView component -->
+          <ResultModal
+            :showModal="showModal"
+            @update:showModal="showModal = $event"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -42,17 +48,23 @@ import ResultModal from "./components/ResultModal.vue";
 import HeaderUI from "./components/HeaderUI.vue";
 import { state } from "./socket";
 import { socket } from "./socket";
-import { isEmpty, images } from "./helpers";
+import { isEmpty, images, getAccessToken } from "./helpers";
 
-// Define reactive variables using ref()
 const gridData: Ref<any> = ref([]);
+console.log("🚀 ~ gridData:", gridData);
 const isLoaded = ref(false);
+const isValidToken = ref(null);
 
 const startRotate = ref(false);
 const windowWidth = ref(window.innerWidth);
 const showModal = ref(false);
 
-// Computed property for button label
+if (isValidToken.value === null) {
+  getAccessToken().then((token) => {
+    socket.emit("tokenVerification", token);
+  });
+}
+
 const buttonLabel = computed(() => (startRotate.value ? "Stop" : "Start"));
 
 // Function to start the wheel
@@ -75,8 +87,8 @@ watch(state, (newState) => {
     ? []
     : [...newState!.gridData!.gridData];
 
-  let imagePromises = [] as any;
-
+  // Check if all images are loaded
+  let imagePromises = [] as Promise<unknown>[];
   if (
     newState.gridData?.gridData &&
     Array.isArray(newState.gridData?.gridData)
@@ -96,23 +108,30 @@ watch(state, (newState) => {
       isLoaded.value = true;
     })
     .catch((error) => {
+      isLoaded.value = false;
       console.error("Error loading images:", error);
     });
 });
 
 // Function to handle window resize
-const onResize = () => {
+const onWindowResize = () => {
   windowWidth.value = window.innerWidth;
 };
 
-// Add event listeners on component mount
 onMounted(() => {
-  window.addEventListener("resize", onResize);
+  window.addEventListener("resize", onWindowResize);
+  socket.once("isValidToken", (result) => {
+    isValidToken.value = result.isValid;
+    state.userId = result.userId;
+
+    if (result.isValid === false) {
+      socket.disconnect();
+    }
+  });
 });
 
-// Remove event listeners on component unmount
 onUnmounted(() => {
-  window.removeEventListener("resize", onResize);
+  window.removeEventListener("resize", onWindowResize);
   socket.disconnect();
 });
 
