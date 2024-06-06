@@ -1,11 +1,13 @@
 import dairy_milk from "../assets/dairy_milk.png";
 import rice_cake from "../assets/rice_cake.png";
 import truffle_lindt from "../assets/truffle_lindt.png";
+import prize from "../assets/prize.png";
 
 export const images: Record<string, string> = {
   dairy_milk: dairy_milk,
   rice_cake: rice_cake,
   truffle_lindt: truffle_lindt,
+  prize: prize,
 };
 
 export function isEmpty(obj: Record<string, any>) {

@@ -51,7 +51,6 @@ import { socket } from "./socket";
 import { isEmpty, images, getAccessToken } from "./helpers";
 
 const gridData: Ref<any> = ref([]);
-console.log("🚀 ~ gridData:", gridData);
 const isLoaded = ref(false);
 const isValidToken = ref(null);
 
@@ -61,15 +60,18 @@ const showModal = ref(false);
 
 if (isValidToken.value === null) {
   getAccessToken().then((token) => {
-    socket.emit("tokenVerification", token);
+    socket.emit("requestTokenVerification", token);
   });
 }
+
+// Request data from the server
+// TODO: Replace the id with the id from outside
+socket.emit("requestData", "v5FJv24MeALtereVbvAv"); // 4 items
 
 const buttonLabel = computed(() => (startRotate.value ? "Stop" : "Start"));
 
 // Function to start the wheel
 const start = () => {
-  socket.off("getData");
   socket.emit("startRotation");
   gridData.value = state.gridData.gridData;
   startRotate.value = !startRotate.value;
@@ -77,23 +79,36 @@ const start = () => {
 
 // Function to handle the end of the wheel rotation
 const onEnd = () => {
-  showModal.value = true;
+  getGameResult();
   socket.emit("pauseRotation");
+};
+
+const getGameResult = () => {
+  socket.emit(
+    "gameResultRequest",
+    state.firstFinishDegree,
+    state.secondFinishDegree
+  );
+  socket.once("gameResultResponse", (result) => {
+    state.gameResult = result;
+    console.log("🚀 ~ socket.once ~ result:", result);
+  });
 };
 
 // Watch for changes in the state object
 watch(state, (newState) => {
-  gridData.value = isEmpty(newState.gridData.gridData)
+  gridData.value = isEmpty(newState.data.items)
     ? []
-    : [...newState!.gridData!.gridData];
+    : [...newState!.data.items];
+
+  if (!isEmpty(newState.gameResult)) {
+    showModal.value = true;
+  }
 
   // Check if all images are loaded
   let imagePromises = [] as Promise<unknown>[];
-  if (
-    newState.gridData?.gridData &&
-    Array.isArray(newState.gridData?.gridData)
-  ) {
-    imagePromises = newState.gridData.gridData.map((item) => {
+  if (newState.data.items && Array.isArray(newState.data.items)) {
+    imagePromises = newState.data.items.map((item: any) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
         img.src = images[item.image];
@@ -120,13 +135,17 @@ const onWindowResize = () => {
 
 onMounted(() => {
   window.addEventListener("resize", onWindowResize);
-  socket.once("isValidToken", (result) => {
+  socket.once("responseTokenVerification", (result) => {
     isValidToken.value = result.isValid;
     state.userId = result.userId;
 
     if (result.isValid === false) {
       socket.disconnect();
     }
+  });
+
+  socket.on("responseData", (data) => {
+    state.data = data;
   });
 });
 

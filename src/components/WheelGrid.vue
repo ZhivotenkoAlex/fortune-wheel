@@ -14,7 +14,6 @@ import { computed } from "vue";
 import { state } from "../socket";
 import { images } from "@/helpers";
 
-// Define component props
 const props = defineProps({
   rotate: { type: Number, required: true },
   gridItem: { type: Object, required: true, default: () => {} },
@@ -25,10 +24,10 @@ const image = images[props.gridItem.image];
 
 const gridStyle = computed(() => {
   const itemRotate = props.rotate;
-  const itemSkewY = state.gridData.gridSkewY;
+  const itemSkewY = state.data.gridSkewY;
   const gridTransform = `rotate(${itemRotate}deg) skewY(${-1 * itemSkewY}deg)`;
-  const bgColor = `#${props.gridItem.bgColor}`;
-  const fontColor = `#${props.gridItem.fontColor}`;
+  const bgColor = props.gridItem.bgColor;
+  const fontColor = props.gridItem.fontColor;
   return {
     transform: gridTransform,
     width: props.size,
@@ -39,7 +38,7 @@ const gridStyle = computed(() => {
 });
 
 const itemContainerStyle = computed(() => {
-  const itemSkewY = state.gridData.gridSkewY;
+  const itemSkewY = state.data.gridSkewY;
   const contentSkewY = itemSkewY;
   const contentRotate = (90 - itemSkewY) / 2;
   const itemContentTransform = `skewY(${contentSkewY}deg) rotate(${contentRotate}deg)`;
@@ -81,6 +80,7 @@ const itemBaseStyle = computed(() => {
   align-items: center;
   padding-left: 10px;
   transform: rotate(90deg);
+  gap: 5px;
 }
 
 .gridItem-Image {

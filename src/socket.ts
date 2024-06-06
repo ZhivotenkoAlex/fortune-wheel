@@ -11,11 +11,15 @@ export const state = reactive({
   ping: null as number | null,
   isLoaded: false,
   userId: null as string | null,
+  data: {} as any,
+  firstFinishDegree: null as number | null,
+  secondFinishDegree: null as number | null,
+  gameResult: {} as any,
 });
 
 // Define the URL for the socket connection
-// const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
-const URL = "http://localhost:5001";
+const URL = "https://hello-world-1-s56fejl5iq-uc.a.run.app";
+// const URL = "http://localhost:5001";
 
 export const socket: Socket = io(URL, { transports: ["websocket"] });
 
@@ -29,16 +33,11 @@ socket.on("connect", () => {
   state.connected = true;
 });
 
-let start: number;
+const start = Date.now();
 
-socket.on("getData", (data: Data) => {
-  state.gridData = data;
-  start = Date.now();
-
-  socket.emit("ping", () => {
-    const duration = Date.now() - start;
-    state.ping = duration;
-  });
+socket.emit("ping", () => {
+  const duration = Date.now() - start;
+  state.ping = duration;
 });
 
 export type Data = {
