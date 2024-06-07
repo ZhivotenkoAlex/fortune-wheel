@@ -71,7 +71,7 @@ socket.emit("requestData", "v5FJv24MeALtereVbvAv"); // 4 items
 
 const buttonLabel = computed(() => (startRotate.value ? "Stop" : "Start"));
 
-// Function to start the wheel
+// Function to start the wheel rotation
 const start = () => {
   socket.emit("startRotation");
   gridData.value = state.gridData.gridData;
