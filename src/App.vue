@@ -95,6 +95,17 @@ const getGameResult = () => {
   });
 };
 
+watch(state, (newState) => {
+  if (newState.ping === null) {
+    const start = Date.now();
+
+    socket.emit("ping", () => {
+      const duration = Date.now() - start;
+      state.ping = duration;
+    });
+  }
+});
+
 // Watch for changes in the state object
 watch(state, (newState) => {
   gridData.value = isEmpty(newState.data.items)

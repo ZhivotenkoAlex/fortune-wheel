@@ -33,13 +33,6 @@ socket.on("connect", () => {
   state.connected = true;
 });
 
-const start = Date.now();
-
-socket.emit("ping", () => {
-  const duration = Date.now() - start;
-  state.ping = duration;
-});
-
 export type Data = {
   gridData: DataItem[];
   gridRotate: number;
