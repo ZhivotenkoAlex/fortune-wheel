@@ -15,7 +15,7 @@
           <FortuneWheelVue
             v-model="startRotate"
             :size="wheelSize"
-            @onEnd="onEnd"
+            @onEnd="handleOnEnd"
           ></FortuneWheelVue>
 
           <!-- Start button -->
@@ -25,7 +25,7 @@
           <FortuneWheelVue
             v-model="startRotate"
             :size="wheelSize"
-            @onEnd="onEnd"
+            @onEnd="handleOnEnd"
             direction="counterclockwise"
           ></FortuneWheelVue>
 
@@ -57,6 +57,7 @@ const isValidToken = ref(null);
 const startRotate = ref(false);
 const windowWidth = ref(window.innerWidth);
 const showModal = ref(false);
+const onEndCalled = ref(false);
 
 if (isValidToken.value === null) {
   getAccessToken().then((token) => {
@@ -75,12 +76,16 @@ const start = () => {
   socket.emit("startRotation");
   gridData.value = state.gridData.gridData;
   startRotate.value = !startRotate.value;
+  onEndCalled.value = false;
 };
 
 // Function to handle the end of the wheel rotation
-const onEnd = () => {
-  getGameResult();
-  socket.emit("pauseRotation");
+const handleOnEnd = () => {
+  if (!onEndCalled.value) {
+    socket.emit("pauseRotation");
+    getGameResult();
+    onEndCalled.value = true;
+  }
 };
 
 const getGameResult = () => {
@@ -91,7 +96,6 @@ const getGameResult = () => {
   );
   socket.once("gameResultResponse", (result) => {
     state.gameResult = result;
-    console.log("🚀 ~ socket.once ~ result:", result);
   });
 };
 
