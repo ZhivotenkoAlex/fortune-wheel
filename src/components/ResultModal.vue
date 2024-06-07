@@ -14,7 +14,7 @@
       </div>
       <p class="result_text">{{ content }}</p>
       <p class="description" v-if="isWinner">
-        Yor prize is {{ prizeType ?? "" }}
+        Yor prize type is {{ prizeType ?? "" }}
       </p>
     </div>
   </div>
@@ -36,15 +36,13 @@ const image = computed(() => {
   let image = "";
   if (isWinner) {
     image =
-      prizeType === "type A"
-        ? images[resultItem.image as string]
-        : images["prize"];
+      prizeType === "A" ? images[resultItem.image as string] : images["prize"];
   }
   return image;
 });
 
 // Define the emit function to emit events
-const emit = defineEmits(["update:showModal", "onEnd"]);
+const emit = defineEmits(["update:showModal"]);
 
 let content: string;
 
