@@ -33,7 +33,7 @@ const isClockwise = ref(props.direction === "clockwise");
 const wheelRef = ref(null) as any;
 
 const data = computed(() => {
-  const data = state.data.items ?? [];
+  const data = state.data?.items ?? [];
   return isClockwise.value ? [...data] : [...data].reverse();
 });
 

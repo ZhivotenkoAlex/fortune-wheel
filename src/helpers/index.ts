@@ -2,6 +2,8 @@ import dairy_milk from "../assets/dairy_milk.png";
 import rice_cake from "../assets/rice_cake.png";
 import truffle_lindt from "../assets/truffle_lindt.png";
 import prize from "../assets/prize.png";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 export const images: Record<string, string> = {
   dairy_milk: dairy_milk,
@@ -71,3 +73,10 @@ export function getAccessToken(): Promise<string | null> {
     }
   });
 }
+
+export const notify = (error: string) => {
+  toast.error(error, {
+    position: toast.POSITION.BOTTOM_CENTER,
+    autoClose: 2000,
+  });
+};

@@ -112,7 +112,7 @@ watch(state, (newState) => {
 
 // Watch for changes in the state object
 watch(state, (newState) => {
-  gridData.value = isEmpty(newState.data.items)
+  gridData.value = isEmpty(newState.data?.items)
     ? []
     : [...newState!.data.items];
 
@@ -122,7 +122,7 @@ watch(state, (newState) => {
 
   // Check if all images are loaded
   let imagePromises = [] as Promise<unknown>[];
-  if (newState.data.items && Array.isArray(newState.data.items)) {
+  if (newState.data?.items && Array.isArray(newState.data.items)) {
     imagePromises = newState.data.items.map((item: any) => {
       return new Promise((resolve, reject) => {
         const img = new Image();

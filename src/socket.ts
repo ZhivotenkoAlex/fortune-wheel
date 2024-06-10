@@ -1,5 +1,6 @@
 import { reactive } from "vue";
 import { io, Socket } from "socket.io-client";
+import { notify } from "./helpers";
 
 // Define the state object using Vue's reactive function
 export const state = reactive({
@@ -31,6 +32,10 @@ if (!socket.connected) {
 socket.on("connect", () => {
   socket.emit("some connection", { for: "everyone" });
   state.connected = true;
+});
+
+socket.on("error", (error) => {
+  notify(error);
 });
 
 export type Data = {
