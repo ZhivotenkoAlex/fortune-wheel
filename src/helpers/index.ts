@@ -19,7 +19,12 @@ export function isEmpty(obj: Record<string, any>) {
 
 export function getTokenFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get("token");
+  return urlParams.get("access_token");
+}
+
+export function getGameIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("game_id");
 }
 
 export function getTokenFromCookie() {
@@ -45,7 +50,6 @@ export function getTokenFromMessage(event: MessageEvent): string | null {
 export function getAccessToken(): Promise<string | null> {
   return new Promise((resolve) => {
     let token: string | null | undefined = getTokenFromUrl();
-
     if (token) {
       resolve(token);
     } else {
@@ -70,6 +74,20 @@ export function getAccessToken(): Promise<string | null> {
       resolve(
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMFliYTh6aW5HdW8wRUtXWW40bCIsInVzZXJuYW1lIjoiUnVkb2xwaDg1QHlhaG9vLmNvbSIsInJvbGVzIjpbIkFkbWluIl0sImlhdCI6MTcxNzUyMDA3OCwiZXhwIjoxNzE4MTI0ODc4fQ.DhvKYF8XWE42RWjylwT9LNsj4TqNBHcK-3reCT9Lwf8"
       );
+    }
+  });
+}
+
+export function getGameId(): Promise<string | null> {
+  return new Promise((resolve) => {
+    const gameId: string | null | undefined = getGameIdFromUrl();
+    if (gameId) {
+      resolve(gameId);
+    }
+
+    // TODO: Remove this default gameId
+    if (!gameId) {
+      resolve("v5FJv24MeALtereVbvAv");
     }
   });
 }

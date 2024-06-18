@@ -48,7 +48,7 @@ import ResultModal from "./components/ResultModal.vue";
 import HeaderUI from "./components/HeaderUI.vue";
 import { state } from "./socket";
 import { socket } from "./socket";
-import { isEmpty, images, getAccessToken } from "./helpers";
+import { isEmpty, images, getAccessToken, getGameId } from "./helpers";
 
 const gridData: Ref<any> = ref([]);
 const isLoaded = ref(false);
@@ -66,8 +66,10 @@ if (isValidToken.value === null) {
 }
 
 // Request data from the server
-// TODO: Replace the id with the id from outside
-socket.emit("requestData", "v5FJv24MeALtereVbvAv"); // 4 items
+
+getGameId().then((gameId) => {
+  socket.emit("requestData", gameId);
+});
 
 const buttonLabel = computed(() => (startRotate.value ? "Stop" : "Start"));
 
