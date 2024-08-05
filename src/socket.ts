@@ -16,6 +16,7 @@ export const state = reactive({
   firstFinishDegree: null as number | null,
   secondFinishDegree: null as number | null,
   gameResult: {} as any,
+  company: {} as any,
 });
 
 // Define the URL for the socket connection

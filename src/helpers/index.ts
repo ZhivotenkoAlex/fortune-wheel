@@ -50,6 +50,7 @@ export function getTokenFromMessage(event: MessageEvent): string | null {
 export function getAccessToken(): Promise<string | null> {
   return new Promise((resolve) => {
     let token: string | null | undefined = getTokenFromUrl();
+    console.log("🚀 ~ returnnewPromise ~ token:", token);
     if (token) {
       resolve(token);
     } else {
@@ -72,7 +73,7 @@ export function getAccessToken(): Promise<string | null> {
     // TODO: Remove this default token
     if (!token) {
       resolve(
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMFliYTh6aW5HdW8wRUtXWW40bCIsInVzZXJuYW1lIjoiUnVkb2xwaDg1QHlhaG9vLmNvbSIsInJvbGVzIjpbIkFkbWluIl0sImlhdCI6MTcxNzUyMDA3OCwiZXhwIjoxNzE4MTI0ODc4fQ.DhvKYF8XWE42RWjylwT9LNsj4TqNBHcK-3reCT9Lwf8"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMFliYTh6aW5HdW8wRUtXWW40bCIsInVzZXJuYW1lIjoiUnVkb2xwaDg1QHlhaG9vLmNvbSIsImlhdCI6MTcyMjg4NDI0MiwiZXhwIjoxNzIyODg1MTQyfQ.xQlRr4BEcSty-ZSZX2WfuSsg8Jyaq97yvkp_s5lmoFQ"
       );
     }
   });
@@ -87,7 +88,7 @@ export function getGameId(): Promise<string | null> {
 
     // TODO: Remove this default gameId
     if (!gameId) {
-      resolve("v5FJv24MeALtereVbvAv");
+      resolve("9hLSNC4VfKYMWICrTT3j");
     }
   });
 }

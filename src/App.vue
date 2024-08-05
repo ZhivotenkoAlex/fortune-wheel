@@ -65,11 +65,15 @@ if (isValidToken.value === null) {
   });
 }
 
-// Request data from the server
+// Request data from the server one by one, to get companyId from the gameConfig on the backend
 
-getGameId().then((gameId) => {
-  socket.emit("requestData", gameId);
-});
+getGameId()
+  .then((gameId) => {
+    socket.emit("requestData", gameId);
+  })
+  .then(() => {
+    socket.emit("requestCompany");
+  });
 
 const buttonLabel = computed(() => (startRotate.value ? "Stop" : "Start"));
 
@@ -145,6 +149,21 @@ watch(state, (newState) => {
     });
 });
 
+// Watch for changes in state.company
+watch(
+  () => state.company,
+  (newCompany) => {
+    console.log("🚀 ~ newCompany:", newCompany);
+    if (newCompany.layout_font_url && newCompany.layout_font_font_type) {
+      applyCustomFont(
+        newCompany.layout_font_url,
+        newCompany.layout_font_font_type
+      );
+    }
+  },
+  { immediate: true }
+);
+
 // Function to handle window resize
 const onWindowResize = () => {
   windowWidth.value = window.innerWidth;
@@ -164,12 +183,32 @@ onMounted(() => {
   socket.on("responseData", (data) => {
     state.data = data;
   });
+
+  socket.on("responseCompany", (company) => {
+    state.company = company;
+  });
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", onWindowResize);
   socket.disconnect();
 });
+
+function applyCustomFont(fontUrl: string, fontFamily: string) {
+  const styleElement = document.createElement("style");
+  styleElement.type = "text/css";
+  styleElement.textContent = `
+    @font-face {
+      font-family: '${fontFamily}';
+      src: url('${fontUrl}');
+    }
+    * {
+      font-family: '${fontFamily}', sans-serif;
+    }
+  `;
+
+  document.head.appendChild(styleElement);
+}
 
 // Computed property for wheel size
 const wheelSize = computed(() => {
