@@ -39,6 +39,7 @@ export function getTokenFromMessage(event: MessageEvent): string | null {
   const origins = [
     "http://localhost:5173",
     "https://hello-world-1-s56fejl5iq-uc.a.run.app",
+    "https://wheel-api-s56fejl5iq-lm.a.run.app",
   ];
 
   if (origins.includes(event.origin)) {
@@ -50,7 +51,6 @@ export function getTokenFromMessage(event: MessageEvent): string | null {
 export function getAccessToken(): Promise<string | null> {
   return new Promise((resolve) => {
     let token: string | null | undefined = getTokenFromUrl();
-    console.log("🚀 ~ returnnewPromise ~ token:", token);
     if (token) {
       resolve(token);
     } else {
