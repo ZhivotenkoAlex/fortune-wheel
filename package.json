@@ -12,7 +12,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write .",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "firebase deploy --only hosting:fortunegame"
   },
   "dependencies": {
     "@vue/cli": "^5.0.8",
