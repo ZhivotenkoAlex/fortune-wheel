@@ -153,12 +153,8 @@ watch(state, (newState) => {
 watch(
   () => state.company,
   (newCompany) => {
-    console.log("🚀 ~ newCompany:", newCompany);
     if (newCompany.layout_font_url && newCompany.layout_font_font_type) {
-      applyCustomFont(
-        newCompany.layout_font_url,
-        newCompany.layout_font_font_type
-      );
+      applyCustomStyles(newCompany);
     }
   },
   { immediate: true }
@@ -194,7 +190,9 @@ onUnmounted(() => {
   socket.disconnect();
 });
 
-function applyCustomFont(fontUrl: string, fontFamily: string) {
+function applyCustomStyles(company: any) {
+  const fontFamily = company.layout_font_font_type;
+  const fontUrl = company.layout_font_url;
   const styleElement = document.createElement("style");
   styleElement.type = "text/css";
   styleElement.textContent = `
