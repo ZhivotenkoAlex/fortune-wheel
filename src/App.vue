@@ -52,7 +52,7 @@ import { isEmpty, images, getAccessToken, getGameId } from "./helpers";
 
 const gridData: Ref<any> = ref([]);
 const isLoaded = ref(false);
-const isValidToken = ref(null);
+const isValidToken = ref(true);
 
 const startRotate = ref(false);
 const windowWidth = ref(window.innerWidth);
@@ -167,14 +167,14 @@ const onWindowResize = () => {
 
 onMounted(() => {
   window.addEventListener("resize", onWindowResize);
-  socket.once("responseTokenVerification", (result) => {
-    isValidToken.value = result.isValid;
-    state.userId = result.userId;
+  // socket.once("responseTokenVerification", (result) => {
+  //   isValidToken.value = result.isValid;
+  //   state.userId = result.userId;
 
-    if (result.isValid === false) {
-      socket.disconnect();
-    }
-  });
+  //   if (result.isValid === false) {
+  //     socket.disconnect();
+  //   }
+  // });
 
   socket.on("responseData", (data) => {
     state.data = data;

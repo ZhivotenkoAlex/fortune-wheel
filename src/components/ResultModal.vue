@@ -22,6 +22,7 @@
 
 <script setup lang="ts">
 import { computed, defineProps, defineEmits, watch } from "vue";
+import { useRouter } from "vue-router";
 import { state } from "@/socket";
 import { socket } from "../socket";
 import { images } from "@/helpers";
@@ -66,6 +67,8 @@ watch(
   }
 );
 
+const router = useRouter();
+
 const closeModal = () => {
   emit("update:showModal", false);
   state.gameResult = {};
@@ -75,6 +78,11 @@ const closeModal = () => {
     const duration = Date.now() - start;
     state.ping = duration;
   });
+  goBack();
+};
+
+const goBack = () => {
+  router.go(-1);
 };
 </script>
 

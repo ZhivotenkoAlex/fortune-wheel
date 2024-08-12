@@ -5,8 +5,12 @@ import vue from "@vitejs/plugin-vue";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/fortune-wheel/",
+  // base: "/fortune-wheel/",
+  root: "./",
   plugins: [vue()],
+  build: {
+    outDir: "dist",
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
