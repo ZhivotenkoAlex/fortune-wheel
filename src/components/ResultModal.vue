@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { computed, defineProps, defineEmits, watch } from "vue";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
 import { state } from "@/socket";
 import { socket } from "../socket";
 import { images } from "@/helpers";
@@ -67,7 +67,7 @@ watch(
   }
 );
 
-const router = useRouter();
+// const router = useRouter();
 
 const closeModal = () => {
   emit("update:showModal", false);
@@ -82,7 +82,8 @@ const closeModal = () => {
 };
 
 const goBack = () => {
-  router.go(-1);
+  // router.go(-1);
+  window.close();
 };
 </script>
 
