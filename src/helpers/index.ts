@@ -18,8 +18,14 @@ export function isEmpty(obj: Record<string, any>) {
 }
 
 export function getTokenFromUrl() {
+  const demoToken =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJVcXVCdnU4bDVUNlpuS0c0Z2pkUCIsInVzZXJuYW1lIjoiZGVtb0BnYW1lLmNvbSIsImlhdCI6MTczMzQ0MzU0MCwiZXhwIjoxODg4OTYzNTQwfQ.O_BelqUuxYBsfvWFewcHb4GRRgZBNVdnSAEO-eh84-M";
   const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get("access_token");
+  let accessToken = urlParams.get("access_token");
+  if (!accessToken) {
+    accessToken = demoToken;
+  }
+  return accessToken;
 }
 
 export function getGameIdFromUrl() {
@@ -86,9 +92,9 @@ export function getGameId(): Promise<string | null> {
       resolve(gameId);
     }
 
-    // TODO: Remove this default gameId
+    //  Game_config id for the demo game
     if (!gameId) {
-      resolve("9hLSNC4VfKYMWICrTT3j");
+      resolve("1OfYYkkvnWsn2D748qrx");
     }
   });
 }

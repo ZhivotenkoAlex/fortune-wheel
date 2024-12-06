@@ -83,7 +83,10 @@ const closeModal = () => {
 
 const goBack = () => {
   // router.go(-1);
-  window.close();
+  // Close the window only if it is not a demo-game user
+  if (state.userId !== "UquBvu8l5T6ZnKG4gjdP") {
+    window.close();
+  }
 };
 </script>
 
